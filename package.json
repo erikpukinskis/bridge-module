@@ -1,0 +1,25 @@
+{
+  "name": "nrtv-browser-library",
+  "version": "0.0.0",
+  "description": "Define modules with dependencies in the browser",
+  "main": "browser-library.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erikpukinskis/nrtv-browser-library.git"
+  },
+  "scripts": {
+    "test": "node --harmony test.js"
+  },
+  "dependencies": {
+    "nrtv-library": "*",
+    "nrtv-browser-bridge": "*",
+    "nrtv-tree": "*"
+  },
+  "devDependencies": {
+    "nrtv-test": "*",
+    "nrtv-server": "*",
+    "nrtv-browse": "*",
+    "nrtv-element": "*"
+  },
+  "license": "ISC"
+}
