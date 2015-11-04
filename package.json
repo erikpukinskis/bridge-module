@@ -2,7 +2,7 @@
   "name": "nrtv-library-bridge",
   "version": "0.1.0",
   "description": "Define modules with dependencies in the browser",
-  "main": "browser-library.js",
+  "main": "library-bridge.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/erikpukinskis/nrtv-browser-library.git"
