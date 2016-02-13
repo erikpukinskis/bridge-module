@@ -4,8 +4,8 @@ var library = require("nrtv-library")(require)
 test.using(
   "accessing the library from the browser",
 
-  [library.reset("nrtv-server"), "nrtv-browse", "nrtv-element", "./library-bridge"],
-  function(expect, done, server, browse, element, LibraryBridge) {
+  ["nrtv-server", "nrtv-browse", "nrtv-element", "./"],
+  function(expect, done, Server, browse, element, LibraryBridge) {
 
     var bridge = new LibraryBridge()
 
@@ -40,10 +40,12 @@ test.using(
       "sayIt(library.get(\"withASneeze\"))"
     )
 
+    var server = new Server()
+
     server.get("/", bridge.sendPage())
 
     server.start(8282)
-    // return done()
+
     library.using(
       ["withASneeze"],
       function(withASneeze) {
@@ -54,9 +56,14 @@ test.using(
     )
 
     function runChecks(browser) {
-      browser.assert.text("body", "bleu sneeze")
-      server.stop()
-      done()
+      browser.assertText(
+        "body", "bleu sneeze",
+        function() {
+          server.stop()
+          browser.done()
+          done()
+        }
+      )
     }
 
   }
