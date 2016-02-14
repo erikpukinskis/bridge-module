@@ -58,11 +58,9 @@ test.using(
     function runChecks(browser) {
       browser.assertText(
         "body", "bleu sneeze",
-        function() {
-          server.stop()
-          browser.done()
-          done()
-        }
+        server.stop,
+        browser.done,
+        done
       )
     }
 
