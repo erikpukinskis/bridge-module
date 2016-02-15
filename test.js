@@ -1,5 +1,6 @@
 var test = require("nrtv-test")(require)
-var library = require("nrtv-library")(require)
+var library = test.library
+
 
 test.using(
   "accessing the library from the browser",
@@ -66,3 +67,63 @@ test.using(
 
   }
 )
+
+
+
+test.using(
+  "add nrtv-library singletons as bridge modules",
+  ["./", "nrtv-server", "nrtv-browse"],
+  function(expect, done, LibraryBridge, Server, browse) {
+
+    library.define(
+      "elephantize",
+      function() {
+        function elephantize(name) {
+          return name+" D. Elephant"
+        }
+        return elephantize
+      }
+    )
+
+    var bridge = new LibraryBridge()
+
+    library.using(
+      ["elephantize"],
+      function(elephantize) {
+
+        var write = bridge.defineFunction(
+          [bridge.define(elephantize)],
+          function(elephantize) {
+            document.querySelector("body").innerHTML = "I am "+elephantize("Erik")
+          }
+        )
+
+        bridge.asap(write)
+
+        var server = new Server()
+
+        server.addRoute("get", "/", bridge.sendPage())
+
+        server.start(3991)
+
+        browse("http://localhost:3991",
+          checkName)
+
+        function checkName(browser) {
+          browser.assertText(
+            "body",
+            "I am Erik D. Elephant",
+            browser.done,
+            server.stop,
+            done
+          )
+        }
+
+      }
+    )
+
+
+  }
+)
+
+

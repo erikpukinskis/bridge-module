@@ -38,12 +38,13 @@ module.exports = library.export(
         for(var i=0; i<arguments.length; i++) {
           var arg = arguments[i]
 
-          if (arg.__isNrtvLibraryModule) {
+          var nrtvModule = arg.__isNrtvLibraryModule ? arg : arg.__nrtvModule
 
+          if (nrtvModule) {
             module = new BoundModule(
-              arg.name,
-              arg.func,
-              arg.dependencies,
+              nrtvModule.name,
+              nrtvModule.func,
+              nrtvModule.dependencies,
               this.library.binding.identifier
             )
           } else if (typeof arg == "string") {
@@ -83,6 +84,9 @@ module.exports = library.export(
     )
 
     function BoundModule(name, func, dependencies, libraryKey) {
+      if (!name) {
+        throw new Error("where's the name?")
+      }
       this.name = name
       this.func = func
       this.dependencies = dependencies
