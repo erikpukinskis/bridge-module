@@ -2,86 +2,72 @@ var library = require("nrtv-library")(require)
 
 module.exports = library.export(
   "nrtv-browser-library",
-  ["nrtv-browser-bridge", "nrtv-tree", "nrtv-library"],
-  function(BrowserBridge, Tree, Library) {
+  ["nrtv-tree", "nrtv-library"],
+  function(Tree, Library) {
 
-    function LibraryBridge() {
+    function bridgeModule(sourceLibrary, name, bridge) {
 
-      var bridge = this.bridge = new BrowserBridge()
+      var libraryBinding = getLibraryBinding(bridge)
 
-      if (!bridge) {
-        throw new Error("You need to pass a bridge to browser-library: new LibraryBridge(bridge)")
+      var moduleBinding = bridge.__nrtvModuleBindings[name]
+
+      if (moduleBinding) { return moduleBinding }
+
+      var module = sourceLibrary.modules[name]
+
+      for(var i=0; i<module.dependencies.length; i++) {
+
+        var depName = module.dependencies[i]
+
+        bridgeModule(sourceLibrary, depName, bridge)
       }
 
-      var treeSingleton = bridge.defineSingleton("Tree", Tree.generateConstructor)
+      var moduleBinding =
+        new BoundModule(
+          module.name,
+          module.func,
+          module.dependencies,
+          libraryBinding.binding.identifier
+        )
+
+      bridge.asap(moduleBinding.source())
+
+      bridge.__nrtvModuleBindings[name] = moduleBinding
+
+      return moduleBinding
+    }
+
+
+    function getLibraryBinding(bridge) {
+      var binding = bridge.__libraryBinding
+
+      if (binding) { return binding }
+
+      var treeSingleton = bridge.defineSingleton("Tree", Tree.generator)
 
       var librarySingleton = bridge.defineSingleton(
         "Library",
         [treeSingleton],
-        Library.generateConstructor
+        Library.generator
       )
 
-      this.library = bridge.defineSingleton(
+      // This is exactly what the library bridge is for. Except in order to handle dependencies we need to handle some dependencies, so there is a bootstrapping problem.
+
+      // So we just rely on tree and library to expose their generators, and we rely on those modules not having any other dependencies. We load those singletons by hand and then after that we can use the library to hook up dependencies.
+
+      var libraryBinding = bridge.defineSingleton(
         "library",
         [librarySingleton],
         function(Library) {
           return new Library()
         }
       )
+
+      bridge.__nrtvModuleBindings = {}
+      bridge.__nrtvLibraryBinding = libraryBinding.binding.identifier
+
+      return libraryBinding
     }
-
-    LibraryBridge.prototype.define =
-      function() {
-
-        var module
-
-        for(var i=0; i<arguments.length; i++) {
-          var arg = arguments[i]
-
-          var nrtvModule = arg.__isNrtvLibraryModule ? arg : arg.__nrtvModule
-
-          if (nrtvModule) {
-            module = new BoundModule(
-              nrtvModule.name,
-              nrtvModule.func,
-              nrtvModule.dependencies,
-              this.library.binding.identifier
-            )
-          } else if (typeof arg == "string") {
-            var name = arg
-          } else if (typeof arg == "function") {
-            var func = arg
-          } else if (Array.isArray(arg)) {
-            var dependencies = arg
-          }
-        }
-
-        if (!module) {
-          module = new BoundModule(
-            name,
-            func,
-            dependencies,
-            this.library.binding.identifier
-          )
-        }
-
-        this.bridge.asap(module.source())
-
-        return module
-      }
-
-    // Maybe someday library knows something about modules that extend other modules?
-
-    var methods = ["defineFunction", "asap", "sendPage"]
-
-    methods.forEach(
-      function(method) {
-        LibraryBridge.prototype[method] =
-          function() {
-            return this.bridge[method].apply(this.bridge, arguments)
-          }
-      }
-    )
 
     function BoundModule(name, func, dependencies, libraryKey) {
       if (!name) {
@@ -105,6 +91,6 @@ module.exports = library.export(
         return this.libraryKey+".define("+JSON.stringify(this.name)+", "+JSON.stringify(this.dependencies)+", "+this.func.toString()+")"        
       }
 
-    return LibraryBridge
+    return bridgeModule
   }
 )

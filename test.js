@@ -1,31 +1,30 @@
 var test = require("nrtv-test")(require)
 var library = test.library
 
-
 test.using(
   "accessing the library from the browser",
 
-  ["nrtv-server", "nrtv-browse", "nrtv-element", "./"],
-  function(expect, done, Server, browse, element, LibraryBridge) {
+  ["nrtv-browser-bridge", "nrtv-server", "nrtv-browse", "nrtv-element", "./"],
+  function(expect, done, BrowserBridge, Server, browse, element, bridgeModule) {
 
-    var bridge = new LibraryBridge()
-
-    bridge.define(
     library.define(
       "hamburg",
       function hamburg() {
         return "bleu"
       }
-    ))
+    )
 
-    var withASneeze = bridge.define(
     library.define(
       "withASneeze",
       ["hamburg"],
       function fleur(hamburg) {
         return hamburg+" sneeze"
       }
-    ))
+    )
+
+    var bridge = new BrowserBridge()
+
+    var withASneeze = bridgeModule(library, "withASneeze", bridge)
 
     var sayIt = bridge.defineFunction(
       [withASneeze],
@@ -43,7 +42,7 @@ test.using(
 
     var server = new Server()
 
-    server.get("/", bridge.sendPage())
+    server.addRoute("get", "/", bridge.sendPage())
 
     server.start(8282)
 
@@ -72,8 +71,8 @@ test.using(
 
 test.using(
   "add nrtv-library singletons as bridge modules",
-  ["./", "nrtv-server", "nrtv-browse"],
-  function(expect, done, LibraryBridge, Server, browse) {
+  ["./", "nrtv-browser-bridge", "nrtv-server", "nrtv-browse"],
+  function(expect, done, bridgeModule, BrowserBridge, Server, browse) {
 
     library.define(
       "elephantize",
@@ -85,43 +84,37 @@ test.using(
       }
     )
 
-    var bridge = new LibraryBridge()
+    var bridge = new BrowserBridge()
 
-    library.using(
-      ["elephantize"],
+    var elephantizeInBrowser = bridgeModule(library, "elephantize", bridge)
+    
+    var write = bridge.defineFunction(
+      [elephantizeInBrowser],
       function(elephantize) {
-
-        var write = bridge.defineFunction(
-          [bridge.define(elephantize)],
-          function(elephantize) {
-            document.querySelector("body").innerHTML = "I am "+elephantize("Erik")
-          }
-        )
-
-        bridge.asap(write)
-
-        var server = new Server()
-
-        server.addRoute("get", "/", bridge.sendPage())
-
-        server.start(3991)
-
-        browse("http://localhost:3991",
-          checkName)
-
-        function checkName(browser) {
-          browser.assertText(
-            "body",
-            "I am Erik D. Elephant",
-            browser.done,
-            server.stop,
-            done
-          )
-        }
-
+        document.querySelector("body").innerHTML = "I am "+elephantize("Erik")
       }
     )
 
+    bridge.asap(write)
+
+    var server = new Server()
+
+    server.addRoute("get", "/", bridge.sendPage())
+
+    server.start(3991)
+
+    browse("http://localhost:3991",
+      checkName)
+
+    function checkName(browser) {
+      browser.assertText(
+        "body",
+        "I am Erik D. Elephant",
+        browser.done,
+        server.stop,
+        done
+      )
+    }
 
   }
 )

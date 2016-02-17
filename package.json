@@ -12,14 +12,14 @@
   },
   "dependencies": {
     "nrtv-library": "*",
-    "nrtv-browser-bridge": "*",
     "nrtv-tree": "*"
   },
   "devDependencies": {
     "nrtv-test": "*",
     "nrtv-server": "*",
     "nrtv-browse": "*",
-    "nrtv-element": "*"
+    "nrtv-element": "*",
+    "nrtv-browser-bridge": "*"
   },
   "license": "ISC"
 }
