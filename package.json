@@ -1,6 +1,6 @@
 {
   "name": "nrtv-library-bridge",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Define modules with dependencies in the browser",
   "main": "library-bridge.js",
   "repository": {
