@@ -30,7 +30,9 @@ module.exports = library.export(
           libraryBinding.binding.identifier
         )
 
-      bridge.asap(moduleBinding.source())
+      bridge.asap(
+        moduleSource(libraryBinding.binding.identifier, module)
+      )
 
       bridge.__nrtvModuleBindings[name] = moduleBinding
 
@@ -39,7 +41,7 @@ module.exports = library.export(
 
 
     function getLibraryBinding(bridge) {
-      var binding = bridge.__libraryBinding
+      var binding = bridge.__nrtvLibraryBinding
 
       if (binding) { return binding }
 
@@ -68,7 +70,7 @@ module.exports = library.export(
       )
 
       bridge.__nrtvModuleBindings = {}
-      bridge.__nrtvLibraryBinding = libraryBinding.binding.identifier
+      bridge.__nrtvLibraryBinding = libraryBinding
 
       return libraryBinding
     }
@@ -92,10 +94,9 @@ module.exports = library.export(
         return this.libraryKey+".get(\""+this.name+"\")"
       }
 
-    BoundModule.prototype.source =
-      function() {
-        return this.libraryKey+".define("+JSON.stringify(this.name)+", "+JSON.stringify(this.dependencies)+", "+this.func.toString()+")"        
-      }
+    function moduleSource(libraryIdentifier, module) {
+      return libraryIdentifier+".define("+JSON.stringify(module.name)+", "+JSON.stringify(module.dependencies)+", "+module.func.toString()+")"        
+    }
 
     return bridgeModule
   }
