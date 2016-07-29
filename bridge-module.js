@@ -7,7 +7,15 @@ module.exports = library.export(
 
     function bridgeModule(sourceLibrary, name, bridge) {
 
-      var libraryBinding = getLibraryBinding(bridge)
+      var libraryIdentifier = bridgeLibrary(bridge)
+
+      function deAlias(name) {
+        var out = sourceLibrary.aliases[name] || name
+        console.log("de-aliasing", name, "->", out)
+        return out
+      }
+
+      name = deAlias(name)
 
       var moduleBinding = bridge.__nrtvModuleBindings[name]
 
@@ -15,23 +23,28 @@ module.exports = library.export(
 
       var module = sourceLibrary.modules[name]
 
-      for(var i=0; i<module.dependencies.length; i++) {
-
-        var depName = module.dependencies[i]
-
-        bridgeModule(sourceLibrary, depName, bridge)
+      if (!module) {
+        throw new Error(sourceLibrary.id+" does not seem to know about any so-called \""+name+"\" module")
       }
+
+      var deps = module.dependencies.map(deAlias)
+
+      var func = module.func
+
+      deps.forEach(function(dep) {
+        bridgeModule(sourceLibrary, dep, bridge)
+      })
 
       var moduleBinding =
         new BoundModule(
-          module.name,
-          module.func,
-          module.dependencies,
-          libraryBinding.binding.identifier
+          name,
+          func,
+          deps,
+          libraryIdentifier
         )
 
       bridge.asap(
-        moduleSource(libraryBinding.binding.identifier, module)
+        moduleSource(libraryIdentifier, name, deps, func)
       )
 
       bridge.__nrtvModuleBindings[name] = moduleBinding
@@ -40,10 +53,10 @@ module.exports = library.export(
     }
 
 
-    function getLibraryBinding(bridge) {
+    function bridgeLibrary(bridge) {
       var binding = bridge.__nrtvLibraryBinding
 
-      if (binding) { return binding }
+      if (binding) { return binding.binding.identifier }
 
       var treeSingleton = bridge.defineSingleton("Tree", Tree.generator)
 
@@ -72,7 +85,7 @@ module.exports = library.export(
       bridge.__nrtvModuleBindings = {}
       bridge.__nrtvLibraryBinding = libraryBinding
 
-      return libraryBinding
+      return libraryBinding.binding.identifier
     }
 
     // Uh oh. This should be coming from function-call!!
@@ -139,8 +152,8 @@ module.exports = library.export(
       }
     }
 
-    function moduleSource(libraryIdentifier, module) {
-      return libraryIdentifier+".define("+JSON.stringify(module.name)+", "+JSON.stringify(module.dependencies)+", "+module.func.toString()+")"        
+    function moduleSource(libraryIdentifier, name, deps, func) {
+      return libraryIdentifier+".define("+JSON.stringify(name)+", "+JSON.stringify(deps)+", "+func.toString()+")"
     }
 
     return bridgeModule
