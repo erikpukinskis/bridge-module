@@ -2,6 +2,44 @@ var test = require("nrtv-test")(require)
 var library = test.library
 
 test.using(
+  "bind arguments to a singleton",
+  ["./", "nrtv-browser-bridge"],
+  function(expect, done, bridgeModule, BrowserBridge) {
+
+    library.define(
+      "equivocate",
+      function ummmm(something, bodyLanguage) {
+        console.log("We are "+something+"ish")
+        bodyLanguage()
+      }
+    )
+
+    var bridge = new BrowserBridge()
+
+    var grimmace = bridge.defineFunction(function grimmace() {
+      cheeks.raise()
+      eyes.squint()
+      head.turn("slightly")
+    })
+
+    var equivocate = bridgeModule(library, "equivocate", bridge)
+
+    var hunger = equivocate.withArgs("hungry", grimmace)
+
+    expect(hunger.evalable()).to.equal(
+      "library.get(\"equivocate\")(\"hungry\", grimmace)"
+    )
+
+    expect(hunger.callable()).to.equal(
+      "library.get(\"equivocate\").bind(null, \"hungry\", grimmace)"
+    )
+
+    done()
+  }
+)
+
+
+test.using(
   "accessing the library from the browser",
 
   ["nrtv-browser-bridge", "nrtv-server", "nrtv-browse", "nrtv-element", "./"],

@@ -77,7 +77,7 @@ module.exports = library.export(
 
     // Uh oh. This should be coming from function-call!!
 
-    function BoundModule(name, func, dependencies, libraryKey) {
+    function BoundModule(name, func, dependencies, libraryKey, args) {
       if (!name) {
         throw new Error("where's the name?")
       }
@@ -85,14 +85,59 @@ module.exports = library.export(
       this.func = func
       this.dependencies = dependencies
       this.libraryKey = libraryKey
+      this.args = args
+      this.__BrowserBridgeBinding = true
     }
 
-
-    BoundModule.prototype.callable =
-    BoundModule.prototype.evalable =
+    BoundModule.prototype.get =
       function() {
         return this.libraryKey+".get(\""+this.name+"\")"
       }
+
+    BoundModule.prototype.callable =
+      function() {
+        if (this.args) {
+          return this.get()+".bind(null, "+argumentString(this.args)+")"
+        } else {
+          return this.get()
+        }
+      }
+
+    BoundModule.prototype.evalable =
+      function() {
+        if (this.args) {
+          return this.get()+"("+argumentString(this.args)+")"
+        } else {
+          return this.get()
+        }
+      }
+
+    BoundModule.prototype.withArgs =
+      function() {
+        var args = Array.prototype.slice.call(arguments)
+
+        if (this.args) {
+          var args = [].concat(this.args, args)
+        } else {
+          var args = args
+        }
+
+        return new BoundModule(this.name, this.func, this.dependencies, this.libraryKey, args)
+      }
+
+    function argumentString(args) {
+      return args.map(argToString).join(", ")
+    }
+
+    function argToString(arg) {
+      var isBinding = arg && arg.binding && arg.binding.__BrowserBridgeBinding
+
+      if (isBinding) {
+        return arg.callable()
+      } else {
+        return JSON.stringify(arg)
+      }
+    }
 
     function moduleSource(libraryIdentifier, module) {
       return libraryIdentifier+".define("+JSON.stringify(module.name)+", "+JSON.stringify(module.dependencies)+", "+module.func.toString()+")"        
