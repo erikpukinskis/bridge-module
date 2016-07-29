@@ -10,9 +10,7 @@ module.exports = library.export(
       var libraryIdentifier = bridgeLibrary(bridge)
 
       function deAlias(name) {
-        var out = sourceLibrary.aliases[name] || name
-        console.log("de-aliasing", name, "->", out)
-        return out
+        return sourceLibrary.aliases[name] || name
       }
 
       name = deAlias(name)
