@@ -3,7 +3,7 @@ var library = test.library
 
 test.using(
   "bind arguments to a singleton",
-  ["./", "nrtv-browser-bridge"],
+  ["./", "browser-bridge"],
   function(expect, done, bridgeModule, BrowserBridge) {
 
     library.define(
@@ -42,7 +42,7 @@ test.using(
 test.using(
   "accessing the library from the browser",
 
-  ["nrtv-browser-bridge", "nrtv-server", "nrtv-browse", "nrtv-element", "./"],
+  ["browser-bridge", "nrtv-server", "nrtv-browse", "web-element", "./"],
   function(expect, done, BrowserBridge, Server, browse, element, bridgeModule) {
 
     library.define(
@@ -109,7 +109,7 @@ test.using(
 
 test.using(
   "add nrtv-library singletons as bridge modules",
-  ["./", "nrtv-browser-bridge", "nrtv-server", "nrtv-browse"],
+  ["./", "browser-bridge", "nrtv-server", "nrtv-browse"],
   function(expect, done, bridgeModule, BrowserBridge, Server, browse) {
 
     library.define(

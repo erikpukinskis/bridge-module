@@ -18,8 +18,8 @@
     "nrtv-test": "*",
     "nrtv-server": "*",
     "nrtv-browse": "*",
-    "nrtv-element": "*",
-    "nrtv-browser-bridge": "*"
+    "web-element": "*",
+    "browser-bridge": "*"
   },
   "license": "ISC"
 }
