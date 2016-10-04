@@ -5,7 +5,7 @@ module.exports = library.export(
   ["nrtv-tree", "nrtv-library"],
   function(Tree, Library) {
 
-    function bridgeModule(sourceLibrary, name, bridge) {
+    function bridgeModule(sourceLibrary, name, bridge, parent) {
 
       var libraryIdentifier = bridgeLibrary(bridge)
 
@@ -30,7 +30,21 @@ module.exports = library.export(
       var func = module.func
 
       deps.forEach(function(dep) {
-        bridgeModule(sourceLibrary, dep, bridge)
+        var path = parent ? parent+" depends on "+name : name
+
+        if (dep == "browser-bridge") {
+          var message = "Trying to use bridgeModule to put browser-bridge on a bridge"
+          if (parent) {
+            message = message + ", because "+path+" depends on browser-bridge"
+          }
+          message = message + ". This is very confusing. I refuse to do it."
+
+          throw new Error(message)
+        }
+
+        bridgeModule(sourceLibrary, dep, bridge, path)
+
+        previousDep = dep
       })
 
       var moduleBinding =
