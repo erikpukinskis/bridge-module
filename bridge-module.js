@@ -64,6 +64,33 @@ module.exports = library.export(
       return moduleBinding
     }
 
+    bridgeModule.definitionWithDeps = function(library, name, bridge) {
+
+      var binding = bridgeModule(library, name, bridge)
+
+      var deps = allDepsFor(name, bridge.__nrtvModuleBindings)
+
+      return deps.map(toSource).join("\n\n")
+
+      function toSource(dep) {
+        var module = bridge.__nrtvModuleBindings[dep]
+
+        return moduleSource(binding.libraryIdentifier, module.name, module.dependencies, module.func)
+      }
+    }
+
+    function allDepsFor(name, bindings, all) {
+      if (!all) { all = [] }
+      if (contains(all, name)) { return }
+      var binding = bindings[name]
+      binding.dependencies.forEach(function(dep) {
+        allDepsFor(dep, bindings, all)
+      })
+      all.push(name)
+      return all
+    }
+
+
 
     function bridgeLibrary(bridge) {
       var binding = bridge.__nrtvLibraryBinding
@@ -102,21 +129,21 @@ module.exports = library.export(
 
     // Uh oh. This should be coming from function-call!!
 
-    function BoundModule(name, func, dependencies, libraryKey, args) {
+    function BoundModule(name, func, dependencies, libraryIdentifier, args) {
       if (!name) {
         throw new Error("where's the name?")
       }
       this.name = name
       this.func = func
       this.dependencies = dependencies
-      this.libraryKey = libraryKey
+      this.libraryIdentifier = libraryIdentifier
       this.args = args
       this.__BrowserBridgeBinding = true
     }
 
     BoundModule.prototype.get =
       function() {
-        return this.libraryKey+".get(\""+this.name+"\")"
+        return this.libraryIdentifier+".get(\""+this.name+"\")"
       }
 
     BoundModule.prototype.callable =
@@ -147,7 +174,7 @@ module.exports = library.export(
           var args = args
         }
 
-        return new BoundModule(this.name, this.func, this.dependencies, this.libraryKey, args)
+        return new BoundModule(this.name, this.func, this.dependencies, this.libraryIdentifier, args)
       }
 
     function argumentString(args) {
@@ -166,6 +193,20 @@ module.exports = library.export(
 
     function moduleSource(libraryIdentifier, name, deps, func) {
       return libraryIdentifier+".define("+JSON.stringify(name)+", "+JSON.stringify(deps)+", "+func.toString()+")"
+    }
+
+    function contains(array, value) {
+      if (!Array.isArray(array)) {
+        throw new Error("looking for "+JSON.stringify(value)+" in "+JSON.stringify(array)+", which is supposed to be an array. But it's not.")
+      }
+      var index = -1;
+      var length = array.length;
+      while (++index < length) {
+        if (array[index] == value) {
+          return true;
+        }
+      }
+      return false;
     }
 
     return bridgeModule
