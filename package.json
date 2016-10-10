@@ -1,6 +1,6 @@
 {
   "name": "bridge-module",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Send modules and their dependencies to the browser",
   "main": "bridge-module.js",
   "repository": {
