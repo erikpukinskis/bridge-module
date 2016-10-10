@@ -13,7 +13,7 @@ module.exports = library.export(
         return sourceLibrary.aliases[name] || name
       }
 
-      name = deAlias(originalName)
+      var name = deAlias(originalName)
 
       var moduleBinding = bridge.__nrtvModuleBindings[name]
 
