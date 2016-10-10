@@ -5,7 +5,7 @@ module.exports = library.export(
   ["nrtv-tree", "nrtv-library"],
   function(Tree, Library) {
 
-    function bridgeModule(sourceLibrary, name, bridge, parent) {
+    function bridgeModule(sourceLibrary, originalName, bridge, parent) {
 
       var libraryIdentifier = bridgeLibrary(bridge)
 
@@ -13,13 +13,20 @@ module.exports = library.export(
         return sourceLibrary.aliases[name] || name
       }
 
-      name = deAlias(name)
+      name = deAlias(originalName)
 
       var moduleBinding = bridge.__nrtvModuleBindings[name]
 
       if (moduleBinding) { return moduleBinding }
 
+
       var module = sourceLibrary.modules[name]
+
+      if (!module) {
+        sourceLibrary.import(originalName)
+        name = deAlias(originalName)
+        module = sourceLibrary.modules[name]
+      }
 
       if (!module) {
         throw new Error(sourceLibrary.id+" does not seem to know about any so-called \""+name+"\" module")
