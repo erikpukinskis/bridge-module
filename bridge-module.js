@@ -155,7 +155,7 @@ module.exports = library.export(
 
     BoundModule.prototype.callable =
       function() {
-        if (this.args) {
+        if (this.args && this.args.length > 0) {
           return this.get()+".bind(null, "+argumentString(this.args)+")"
         } else {
           return this.get()
@@ -164,7 +164,7 @@ module.exports = library.export(
 
     BoundModule.prototype.evalable =
       function() {
-        if (this.args) {
+        if (this.args && this.args.length > 0) {
           return this.get()+"("+argumentString(this.args)+")"
         } else {
           return this.get()
