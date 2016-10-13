@@ -148,6 +148,26 @@ module.exports = library.export(
       this.__BrowserBridgeBinding = true
     }
 
+    BoundModule.prototype.asBinding = function() {
+      return new BindingBinding(this)
+    }
+
+    function BindingBinding(boundModule) {
+      this.boundModule = boundModule
+    }
+
+    BindingBinding.prototype.callable = function() {
+      var source = "functionCall(\"library.get(\\\""+this.boundModule.name+"\\\")\")"
+
+      var hasArgs = this.boundModule.args && this.boundModule.args.length > 0
+
+      if (hasArgs) {
+        source += ".withArgs("+argumentString(this.boundModule.args)+")"
+      }
+
+      return source
+    }
+
     BoundModule.prototype.get =
       function() {
         return this.libraryIdentifier+".get(\""+this.name+"\")"
