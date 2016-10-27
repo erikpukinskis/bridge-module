@@ -81,7 +81,6 @@ module.exports = library.export(
       try {
         throw new Error("bridge-module induced this error for introspection purposes")
       } catch (e) {
-        debugger
         var origin = e.stack.split("\n")[3].substr(7)
         return "// module loaded from "+origin
       }
