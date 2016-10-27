@@ -62,13 +62,29 @@ module.exports = library.export(
           libraryIdentifier
         )
 
+      if (parent) {
+        var comment = "// "+name+" loaded as a dependency because "+parent
+      } else {
+        var comment = loadedComment()
+      }
       bridge.asap(
+        comment+"\n"+
         moduleSource(libraryIdentifier, name, deps, func)
       )
 
       bridge.__nrtvModuleBindings[name] = moduleBinding
 
       return moduleBinding
+    }
+
+    function loadedComment() {
+      try {
+        throw new Error("bridge-module induced this error for introspection purposes")
+      } catch (e) {
+        debugger
+        var origin = e.stack.split("\n")[3].substr(7)
+        return "// module loaded from "+origin
+      }
     }
 
     bridgeModule.definitionWithDeps = function(library, name, bridge) {
