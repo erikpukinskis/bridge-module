@@ -160,7 +160,7 @@ module.exports = library.export(
       this.dependencies = dependencies
       this.libraryIdentifier = libraryIdentifier
       this.args = args
-      this.__BrowserBridgeBinding = true
+      this.__isFunctionCallBinding = true
     }
 
     BoundModule.prototype.asBinding = function() {
@@ -224,7 +224,7 @@ module.exports = library.export(
     }
 
     function argToString(arg) {
-      var isBinding = arg && arg.binding && arg.binding.__BrowserBridgeBinding
+      var isBinding = arg && arg.binding && arg.binding.__isFunctionCallBinding
 
       if (isBinding) {
         return arg.callable()
