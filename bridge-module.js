@@ -224,7 +224,7 @@ module.exports = library.export(
     }
 
     function argToString(arg) {
-      var isBinding = arg && arg.binding && arg.binding.__isFunctionCallBinding
+      var isBinding = arg && arg.binding && arg.__isFunctionCallBinding
 
       if (isBinding) {
         return arg.callable()
