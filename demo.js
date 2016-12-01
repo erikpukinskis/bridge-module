@@ -32,15 +32,14 @@ library.define(
 )
 
 library.using(
-  ["browser-bridge", "./", "web-site"],
-  function(BrowserBridge, bridgeModule, site) {
-
+  ["cook-dinner", "./", "browser-bridge", "web-site"],
+  function(cook, bridgeModule, BrowserBridge, site) {
     var bridge = new BrowserBridge()
 
-    var cook = bridgeModule(library, "cook-dinner", bridge)
+    var cookInBrowser = bridgeModule(library, "cook-dinner", bridge)
 
     bridge.asap(
-      cook.withArgs(["potato"])
+      cookInBrowser.withArgs(["potato"])
     )
 
     site.addRoute("get", "/", bridge.sendPage())
