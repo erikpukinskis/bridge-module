@@ -2,8 +2,8 @@ var library = require("nrtv-library")(require)
 
 module.exports = library.export(
   "bridge-module",
-  ["nrtv-tree", "nrtv-library"],
-  function(Tree, Library) {
+  ["nrtv-tree", "nrtv-library", "function-call"],
+  function(Tree, Library, functionCall) {
 
     function bridgeModule(sourceLibrary, originalName, bridge, parent) {
 
@@ -234,7 +234,16 @@ module.exports = library.export(
     }
 
     function moduleSource(libraryIdentifier, name, deps, func) {
-      return libraryIdentifier+".define("+JSON.stringify(name)+", "+JSON.stringify(deps)+", "+func.toString()+")"
+      var source = libraryIdentifier
+
+      source += ".define("+JSON.stringify(name)+", "
+
+      if (deps.length > 0) {
+        source += JSON.stringify(deps)+", "
+      }
+      source += func.toString()+")"
+
+      return source
     }
 
     function contains(array, value) {

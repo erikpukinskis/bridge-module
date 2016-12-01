@@ -1,7 +1,7 @@
-var test = require("nrtv-test")(require)
-var library = test.library
+var library = require("nrtv-library")(require)
+var runTest = require("run-test")(require)
 
-test.using(
+runTest(
   "bind arguments to a singleton",
   ["./", "browser-bridge"],
   function(expect, done, bridgeModule, BrowserBridge) {
@@ -39,11 +39,11 @@ test.using(
 )
 
 
-test.using(
+runTest(
   "accessing the library from the browser",
 
-  ["browser-bridge", "nrtv-server", "nrtv-browse", "web-element", "./"],
-  function(expect, done, BrowserBridge, Server, browse, element, bridgeModule) {
+  ["browser-bridge", "web-site", "browser-task", "web-element", "./"],
+  function(expect, done, BrowserBridge, WebSite, browserTask, element, bridgeModule) {
 
     library.define(
       "hamburg",
@@ -75,28 +75,28 @@ test.using(
 
 
     expect(sayIt.evalable()).to.equal(
-      "sayIt(library.get(\"withASneeze\"))"
+      "sayIt()"
     )
 
-    var server = new Server()
+    var site = new WebSite()
 
-    server.addRoute("get", "/", bridge.sendPage())
+    site.addRoute("get", "/", bridge.sendPage())
 
-    server.start(8282)
+    site.start(8282)
 
     library.using(
       ["withASneeze"],
       function(withASneeze) {
         expect(withASneeze).to.equal("bleu sneeze")
 
-        browse("http://localhost:8282", runChecks)
+        browserTask("http://localhost:8282", runChecks)
       }
     )
 
     function runChecks(browser) {
       browser.assertText(
         "body", "bleu sneeze",
-        server.stop,
+        site.stop,
         browser.done,
         done
       )
@@ -107,10 +107,10 @@ test.using(
 
 
 
-test.using(
+runTest(
   "add nrtv-library singletons as bridge modules",
-  ["./", "browser-bridge", "nrtv-server", "nrtv-browse"],
-  function(expect, done, bridgeModule, BrowserBridge, Server, browse) {
+  ["./", "browser-bridge", "web-site", "browser-task"],
+  function(expect, done, bridgeModule, BrowserBridge, WebSite, browserTask) {
 
     library.define(
       "elephantize",
@@ -126,22 +126,21 @@ test.using(
 
     var elephantizeInBrowser = bridgeModule(library, "elephantize", bridge)
     
-    var write = bridge.defineFunction(
+
+    bridge.asap(
       [elephantizeInBrowser],
       function(elephantize) {
         document.querySelector("body").innerHTML = "I am "+elephantize("Erik")
       }
     )
 
-    bridge.asap(write)
+    var site = new WebSite()
 
-    var server = new Server()
+    site.addRoute("get", "/", bridge.sendPage())
 
-    server.addRoute("get", "/", bridge.sendPage())
+    site.start(3991)
 
-    server.start(3991)
-
-    browse("http://localhost:3991",
+    browserTask("http://localhost:3991",
       checkName)
 
     function checkName(browser) {
@@ -149,7 +148,7 @@ test.using(
         "body",
         "I am Erik D. Elephant",
         browser.done,
-        server.stop,
+        site.stop,
         done
       )
     }

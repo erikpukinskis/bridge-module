@@ -8,16 +8,17 @@
     "url": "https://github.com/erikpukinskis/bridge-module.git"
   },
   "scripts": {
-    "test": "node --harmony test.js"
+    "test": "node test.js"
   },
   "dependencies": {
     "nrtv-library": "*",
-    "nrtv-tree": "*"
+    "nrtv-tree": "*",
+    "function-call": "*"
   },
   "devDependencies": {
-    "nrtv-test": "*",
-    "nrtv-server": "*",
-    "nrtv-browse": "*",
+    "run-test": "*",
+    "web-site": "*",
+    "browser-task": "*",
     "web-element": "*",
     "browser-bridge": "*"
   },
