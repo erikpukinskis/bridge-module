@@ -1,4 +1,4 @@
-Define modules with dependencies on a [browser bridge](https://github.com/erikpukinskis/browser-bridge):
+**bridge-module** lets you define modules with dependencies on a [browser bridge](https://github.com/erikpukinskis/browser-bridge):
 
 ```javascript
 var BrowserBridge = require("browser-bridge")
