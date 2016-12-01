@@ -177,7 +177,7 @@ module.exports = library.export(
       var hasArgs = this.boundModule.args && this.boundModule.args.length > 0
 
       if (hasArgs) {
-        source += ".withArgs("+argumentString(this.boundModule.args)+")"
+        source += ".withArgs("+functionCall.argumentString(this.boundModule.args)+")"
       }
 
       return source
@@ -189,18 +189,18 @@ module.exports = library.export(
       }
 
     BoundModule.prototype.callable =
-      function() {
+      function(options) {
         if (this.args && this.args.length > 0) {
-          return this.get()+".bind(null, "+argumentString(this.args)+")"
+          return this.get()+".bind(null, "+functionCall.argumentString(this.args)+")"
         } else {
           return this.get()
         }
       }
 
     BoundModule.prototype.evalable =
-      function() {
+      function(options) {
         if (this.args && this.args.length > 0) {
-          return this.get()+"("+argumentString(this.args)+")"
+          return this.get()+"("+functionCall.argumentString(this.args, options)+")"
         } else {
           return this.get()
         }
@@ -218,10 +218,6 @@ module.exports = library.export(
 
         return new BoundModule(this.name, this.func, this.dependencies, this.libraryIdentifier, args)
       }
-
-    function argumentString(args) {
-      return args.map(argToString).join(", ")
-    }
 
     function argToString(arg) {
       var isBinding = arg && arg.binding && arg.__isFunctionCallBinding
