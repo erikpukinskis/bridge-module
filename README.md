@@ -38,45 +38,21 @@ library.define(
   }
 )
 
-var bridge = new BrowserBridge()
-
-var cook = bridgeModule(library, "cook-dinner", bridge)
-
-bridge.asap(
-  cook.withArgs(["potato"])
-)
-
-site.addRoute("get", "/", bridge.sendPage())
-
-site.start(8000)
-```
-
-If you are using nrtv-library for dependency on the resolution in your app already, you get a nice clean global scope:
-
-
-```javascript
-var library = require("nrtv-library")(require)
-
-library.define(
-  "cook-dinner",
-  ["fire"],
-  function(fire) {
-
-    ...
-
-  }
-)
-
-...
-
 library.using(
-  ["browser-bridge", "./", "web-site"],
-  function(BrowserBridge, bridgeModule, site) {
+  ["cook-dinner", "bridge-module", "browser-bridge", "web-site"],
+  function(cook, bridgeModule, BrowserBridge, site) {
     var bridge = new BrowserBridge()
 
-    ...
+    var cookInBrowser = bridgeModule(library, "cook-dinner", bridge)
+
+    bridge.asap(
+      cookInBrowser.withArgs(["potato"])
+    )
+
+    site.addRoute("get", "/", bridge.sendPage())
 
     site.start(8000)
   }
 )
+
 ```
