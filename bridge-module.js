@@ -15,7 +15,9 @@ module.exports = library.export(
 
       var name = deAlias(originalName)
 
-      var moduleBinding = bridge.__nrtvModuleBindings[name]
+      var bindings = bridge.remember("bridge-module/bindings")
+
+      var moduleBinding = bindings[name]
 
       if (moduleBinding) { return moduleBinding }
 
@@ -72,7 +74,7 @@ module.exports = library.export(
         moduleSource(libraryIdentifier, name, deps, func)
       )
 
-      bridge.__nrtvModuleBindings[name] = moduleBinding
+      bindings[name] = moduleBinding
 
       return moduleBinding
     }
@@ -90,12 +92,14 @@ module.exports = library.export(
 
       var binding = bridgeModule(library, name, bridge)
 
-      var deps = allDepsFor(name, bridge.__nrtvModuleBindings)
+      var bindings = bridge.remember("bridge-module/bindings")
+
+      var deps = allDepsFor(name, bindings)
 
       return deps.map(toSource).join("\n\n")
 
       function toSource(dep) {
-        var module = bridge.__nrtvModuleBindings[dep]
+        var module = bindings[dep]
 
         return moduleSource(binding.libraryIdentifier, module.name, module.dependencies, module.func)
       }
@@ -115,7 +119,8 @@ module.exports = library.export(
 
 
     function bridgeLibrary(bridge) {
-      var binding = bridge.__nrtvLibraryBinding
+
+      var binding = bridge.remember("bridge-module/library")
 
       if (binding) { return binding.binding.identifier }
 
@@ -143,8 +148,8 @@ module.exports = library.export(
         }
       )
 
-      bridge.__nrtvModuleBindings = {}
-      bridge.__nrtvLibraryBinding = libraryBinding
+      bridge.see("bridge-module/library", libraryBinding)
+      bridge.see("bridge-module/bindings", {})
 
       return libraryBinding.binding.identifier
     }
