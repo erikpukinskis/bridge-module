@@ -122,7 +122,7 @@ module.exports = library.export(
 
       var binding = bridge.remember("bridge-module/library")
 
-      if (binding) { return binding.binding.identifier }
+      if (binding) { return binding.identifier }
 
       var treeSingleton = bridge.defineSingleton("Tree", Tree.generator)
 
@@ -151,7 +151,7 @@ module.exports = library.export(
       bridge.see("bridge-module/library", libraryBinding)
       bridge.see("bridge-module/bindings", {})
 
-      return libraryBinding.binding.identifier
+      return libraryBinding.identifier
     }
 
     // Uh oh. This should be coming from function-call!!
@@ -225,7 +225,7 @@ module.exports = library.export(
       }
 
     function argToString(arg) {
-      var isBinding = arg && arg.binding && arg.__isFunctionCallBinding
+      var isBinding = arg && arg.__isFunctionCallBinding
 
       if (isBinding) {
         return arg.callable()
