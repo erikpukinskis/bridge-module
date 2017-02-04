@@ -122,24 +122,21 @@ module.exports = library.export(
 
       var binding = bridge.remember("bridge-module/library")
 
-      if (binding) { return binding.identifier }
+      if (binding) { 
+        return binding.identifier 
+      }
 
+      bridge.claimIdentifier("Tree")
       var treeSingleton = bridge.defineSingleton("Tree", Tree.generator)
 
+      bridge.claimIdentifier("Library")
       var librarySingleton = bridge.defineSingleton(
         "Library",
         [treeSingleton],
         Library.generator
       )
 
-      // This is exactly what the library bridge is for. Except in order to handle dependencies we need to handle some dependencies, so there is a bootstrapping problem.
-
-      // So we just rely on tree and library to expose their generators, and we rely on those modules not having any other dependencies. We load those singletons by hand and then after that we can use the library to hook up dependencies.
-
-      // generator maybe is the wrong word. this uses "definition function": https://addyosmani.com/writing-modular-js/ which is fairly literal. It's the function we use for defining the module.
-
-      // Definition. Define. Yup. Definer? defineFunction? Eep, that's ambiguously a verb phrase too.
-
+      bridge.claimIdentifier("library")
       var libraryBinding = bridge.defineSingleton(
         "library",
         [librarySingleton],
@@ -157,9 +154,7 @@ module.exports = library.export(
     // Uh oh. This should be coming from function-call!!
 
     function BoundModule(name, func, dependencies, libraryIdentifier, args) {
-      if (!name) {
-        throw new Error("where's the name?")
-      }
+
       this.name = name
       this.func = func
       this.dependencies = dependencies

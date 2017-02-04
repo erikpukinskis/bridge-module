@@ -80,7 +80,7 @@ runTest(
 
     var site = new WebSite()
 
-    site.addRoute("get", "/", bridge.sendPage())
+    site.addRoute("get", "/", bridge.requestHandler())
 
     site.start(8282)
 
@@ -136,7 +136,7 @@ runTest(
 
     var site = new WebSite()
 
-    site.addRoute("get", "/", bridge.sendPage())
+    site.addRoute("get", "/", bridge.requestHandler())
 
     site.start(3991)
 
