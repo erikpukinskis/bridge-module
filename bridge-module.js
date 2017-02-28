@@ -39,21 +39,10 @@ module.exports = library.export(
       var func = module.func
 
       deps.forEach(function(dep) {
-        var path = parent ? parent+" depends on "+name : name
-
-        if (dep == "browser-bridge") {
-          var message = "Trying to use bridgeModule to put browser-bridge on a bridge"
-          if (parent) {
-            message = message + ", because "+path+" depends on browser-bridge"
-          }
-          message = message + ". This is very confusing. I refuse to do it."
-
-          throw new Error(message)
-        }
-
-        bridgeModule(sourceLibrary, dep, bridge, path)
-
-        previousDep = dep
+        loadModule(bridge, dep, sourceLibrary, {
+          parentName: name,
+          grandparentName: parent
+        })
       })
 
       var moduleBinding =
@@ -77,6 +66,31 @@ module.exports = library.export(
       bindings[name] = moduleBinding
 
       return moduleBinding
+    }
+
+    function loadModule(bridge, moduleToLoad, sourceLibrary, options) {
+      var parentName = options.parentName
+      var grandparentName = options.grandparentName
+
+      var modulePath = parentName
+
+      if (grandparentName) {
+        path = grandparentName+" depends on "+path
+      }
+
+      if (moduleToLoad == "browser-bridge") {
+
+        // bridge.asBinding()
+        var message = "Trying to use bridgeModule to put browser-bridge on a bridge"
+        if (grandparentName) {
+          message = message + ", because "+modulePath+" depends on browser-bridge"
+        }
+        message = message + ". This is very confusing. I refuse to do it."
+
+        throw new Error(message)
+      }
+
+      bridgeModule(sourceLibrary, moduleToLoad, bridge, modulePath)
     }
 
     function loadedComment() {
