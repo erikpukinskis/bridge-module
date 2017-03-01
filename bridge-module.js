@@ -25,7 +25,7 @@ module.exports = library.export(
       var module = sourceLibrary.modules[name]
 
       if (!module) {
-        sourceLibrary.import(originalName)
+        sourceLibrary.using([originalName], function() {})
         name = deAlias(originalName)
         module = sourceLibrary.modules[name]
       }
