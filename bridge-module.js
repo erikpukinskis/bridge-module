@@ -31,7 +31,12 @@ module.exports = library.export(
       }
 
       if (!module) {
-        throw new Error(sourceLibrary.id+" does not seem to know about any so-called \""+name+"\" module")
+        var message = sourceLibrary.id+" does not seem to know about any so-called \""+name+"\" module"
+        if (parent) {
+          message += " which is needed by "+parent
+        }
+
+        throw new Error(message)
       }
 
       var deps = module.dependencies.map(deAlias)
@@ -75,7 +80,7 @@ module.exports = library.export(
       var modulePath = parentName
 
       if (grandparentName) {
-        modulePath = grandparentName+" depends on "+modulePath
+        modulePath = modulePath+" which is needed by "+grandparentName
       }
 
       if (moduleToLoad == "browser-bridge") {
