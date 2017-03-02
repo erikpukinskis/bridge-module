@@ -1,4 +1,4 @@
-var library = require("nrtv-library")(require)
+var library = require("module-library")(require)
 
 library.define(
   "cook-dinner",

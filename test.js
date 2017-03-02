@@ -1,5 +1,5 @@
-var library = require("nrtv-library")(require)
 var runTest = require("run-test")(require)
+var library = runTest.library
 
 runTest(
   "bind arguments to a singleton",

@@ -1,8 +1,8 @@
-var library = require("nrtv-library")(require)
+var library = require("module-library")(require)
 
 module.exports = library.export(
   "bridge-module",
-  ["nrtv-tree", "nrtv-library", "function-call"],
+  ["string-tree", "module-library", "function-call"],
   function(Tree, Library, functionCall) {
 
     function bridgeModule(sourceLibrary, originalName, bridge, parent) {

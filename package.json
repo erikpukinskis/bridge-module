@@ -11,8 +11,8 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "nrtv-library": "*",
-    "nrtv-tree": "*",
+    "module-library": "*",
+    "string-tree": "*",
     "function-call": "*"
   },
   "devDependencies": {
