@@ -75,7 +75,7 @@ module.exports = library.export(
       var modulePath = parentName
 
       if (grandparentName) {
-        path = grandparentName+" depends on "+path
+        modulePath = grandparentName+" depends on "+modulePath
       }
 
       if (moduleToLoad == "browser-bridge") {
