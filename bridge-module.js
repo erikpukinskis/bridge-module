@@ -83,7 +83,7 @@ module.exports = library.export(
 
         // bridge.asBinding()?
 
-        throw new Errr("Trying to use bridgeModule to put browser-bridge on a bridge. "+modulePath+". This is very confusing. I refuse to do it.")
+        throw new Error("Trying to use bridgeModule to put browser-bridge on a bridge. "+modulePath+". This is very confusing. I refuse to do it.")
       }
 
       bridgeModule(sourceLibrary, moduleToLoad, bridge, modulePath)
