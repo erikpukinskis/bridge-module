@@ -33,7 +33,7 @@ module.exports = library.export(
       var nonNrtvModule = !module && !!sourceLibrary.singletonCache[name]
 
       var modulePath = name
-      if (parent) { modulePath += ", which "+parent+" need" }
+      if (parent) { modulePath += " < "+parent }
 
       if (nonNrtvModule) {
         throw new Error("You're trying to load the "+name+" module onto the bridge, but it looks like a regular CommonJS module. If you want to put a module on the client, you have to define it with module-library so we know about its dependencies. "+modulePath)
@@ -48,10 +48,11 @@ module.exports = library.export(
       var func = module.func
 
       deps.forEach(function(dep) {
-        loadModule(bridge, dep, sourceLibrary, {
-          parentName: name,
-          grandparentName: parent
-        })
+        if (dep == "browser-bridge") {
+          throw new Error(modulePath+" wants us to load browser-bridge in the browser. Don't know how to do that yet.")
+        }
+
+        loadModule(bridge, dep, sourceLibrary, modulePath)
       })
 
       var moduleBinding =
@@ -78,13 +79,6 @@ module.exports = library.export(
     }
 
     function loadModule(bridge, moduleToLoad, sourceLibrary, modulePath) {
-
-      if (moduleToLoad == "browser-bridge") {
-
-        // bridge.asBinding()?
-
-        throw new Error("Trying to use bridgeModule to put browser-bridge on a bridge. "+modulePath+". This is very confusing. I refuse to do it.")
-      }
 
       bridgeModule(sourceLibrary, moduleToLoad, bridge, modulePath)
     }
