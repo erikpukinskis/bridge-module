@@ -30,13 +30,17 @@ module.exports = library.export(
         module = sourceLibrary.modules[name]
       }
 
-      if (!module) {
-        var message = sourceLibrary.id+" does not seem to know about any so-called \""+name+"\" module"
-        if (parent) {
-          message += " which is needed by "+parent
-        }
+      var nonNrtvModule = !module && !!sourceLibrary.singletonCache[name]
 
-        throw new Error(message)
+      var modulePath = name
+      if (parent) { modulePath += ", which "+parent+" need" }
+
+      if (nonNrtvModule) {
+        throw new Error("You're trying to load the "+name+" module onto the bridge, but it looks like a regular CommonJS module. If you want to put a module on the client, you have to define it with module-library so we know about its dependencies. "+modulePath)
+      }
+
+      if (!module) {
+        throw new Error(sourceLibrary.id+" does not seem to know about any so-called \""+name+"\" module. "+modulePath)
       }
 
       var deps = module.dependencies.map(deAlias)
@@ -73,26 +77,13 @@ module.exports = library.export(
       return moduleBinding
     }
 
-    function loadModule(bridge, moduleToLoad, sourceLibrary, options) {
-      var parentName = options.parentName
-      var grandparentName = options.grandparentName
-
-      var modulePath = parentName
-
-      if (grandparentName) {
-        modulePath = modulePath+" which is needed by "+grandparentName
-      }
+    function loadModule(bridge, moduleToLoad, sourceLibrary, modulePath) {
 
       if (moduleToLoad == "browser-bridge") {
 
-        // bridge.asBinding()
-        var message = "Trying to use bridgeModule to put browser-bridge on a bridge"
-        if (grandparentName) {
-          message = message + ", because "+modulePath+" depends on browser-bridge"
-        }
-        message = message + ". This is very confusing. I refuse to do it."
+        // bridge.asBinding()?
 
-        throw new Error(message)
+        throw new Errr("Trying to use bridgeModule to put browser-bridge on a bridge. "+modulePath+". This is very confusing. I refuse to do it.")
       }
 
       bridgeModule(sourceLibrary, moduleToLoad, bridge, modulePath)
