@@ -7,6 +7,10 @@ module.exports = library.export(
 
     function bridgeModule(sourceLibrary, originalName, bridge, parent) {
 
+      if (!bridge || !bridge.__isNrtvBrowserBridge) {
+        throw new Error("The third argument of bridgeModule should be a bridge. You passed "+bridge)
+      }
+
       var libraryIdentifier = bridgeLibrary(bridge)
 
       function deAlias(name) {
