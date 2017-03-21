@@ -11,6 +11,10 @@ module.exports = library.export(
         throw new Error("The third argument of bridgeModule should be a bridge. You passed "+bridge)
       }
 
+      if (!sourceLibrary.__isNrtvLibrary) {
+        throw new Error("The first argument to bridgeModule needs to be a module-library. Add library.ref() as one of your dependencies and pass the singleton to bridgeModule.")
+      }
+
       var libraryIdentifier = bridgeLibrary(bridge)
 
       function deAlias(name) {
