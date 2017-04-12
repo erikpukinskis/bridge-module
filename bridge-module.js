@@ -244,12 +244,12 @@ module.exports = library.export(
     function moduleSource(libraryIdentifier, name, deps, func) {
       var source = libraryIdentifier
 
-      source += ".define("+JSON.stringify(name)+", "
+      source += ".define(\n  "+JSON.stringify(name)+",\n  "
 
       if (deps.length > 0) {
-        source += JSON.stringify(deps)+", "
+        source += JSON.stringify(deps)+",\n  "
       }
-      source += func.toString()+")"
+      source += func.toString()+"\n)"
 
       return source
     }
