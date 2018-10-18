@@ -88,6 +88,10 @@ module.exports = library.export(
 
     function loadModule(bridge, moduleToLoad, sourceLibrary, modulePath) {
 
+      if (moduleToLoad.__dependencyType == 'self reference') {
+        return 
+      }
+
       bridgeModule(sourceLibrary, moduleToLoad, bridge, modulePath)
     }
 
