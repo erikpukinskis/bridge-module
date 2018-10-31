@@ -8,9 +8,13 @@ runTest(
 
     library.define(
       "equivocate",
-      function ummmm(something, bodyLanguage) {
-        console.log("We are "+something+"ish")
-        bodyLanguage()
+      function() {
+        function ummmm(something, bodyLanguage) {
+          console.log("We are "+something+"ish")
+          bodyLanguage()
+        }
+
+        return ummmm
       }
     )
 
@@ -71,7 +75,7 @@ runTest(
       }
     )
 
-    bridge.asap(sayIt)
+    bridge.domReady(sayIt)
 
 
     expect(sayIt.evalable()).to.equal(
@@ -127,7 +131,7 @@ runTest(
     var elephantizeInBrowser = bridgeModule(library, "elephantize", bridge)
     
 
-    bridge.asap(
+    bridge.domReady(
       [elephantizeInBrowser],
       function(elephantize) {
         document.querySelector("body").innerHTML = "I am "+elephantize("Erik")

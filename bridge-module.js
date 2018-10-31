@@ -17,25 +17,18 @@ module.exports = library.export(
 
       var libraryIdentifier = bridgeLibrary(bridge)
 
-      function deAlias(name) {
-        return sourceLibrary.aliases[name] || name
-      }
+      var name = sourceLibrary.dealias(originalName)
 
-      var name = deAlias(originalName)
-
-      var bindings = bridge.remember("bridge-module/bindings")
-
-      var moduleBinding = bindings[name]
+      var moduleBinding = bridge.remember("bridge-module/bindings/"+name)
 
       if (moduleBinding) { return moduleBinding }
 
-
-      var module = sourceLibrary.modules[name]
+      var module = sourceLibrary.getModule(name)
 
       if (!module) {
         sourceLibrary.using([originalName], function() {})
-        name = deAlias(originalName)
-        module = sourceLibrary.modules[name]
+        name = sourceLibrary.dealias(originalName)
+        module = sourceLibrary.getModule(name)
       }
 
       var nonNrtvModule = !module && !!sourceLibrary.singletonCache[name]
@@ -51,7 +44,7 @@ module.exports = library.export(
         throw new Error(sourceLibrary.id+" does not seem to know about any so-called \""+name+"\" module. "+modulePath)
       }
 
-      var deps = module.dependencies.map(deAlias)
+      var deps = module.dependencies.map(sourceLibrary.dealias)
 
       var func = module.func
 
@@ -63,7 +56,7 @@ module.exports = library.export(
         loadModule(bridge, dep, sourceLibrary, modulePath)
       })
 
-      var moduleBinding =
+      moduleBinding =
         new BoundModule(
           name,
           func,
@@ -81,7 +74,7 @@ module.exports = library.export(
         moduleSource(libraryIdentifier, name, deps, func)
       )
 
-      bindings[name] = moduleBinding
+      bridge.see("bridge-module/bindings/"+name, moduleBinding)
 
       return moduleBinding
     }

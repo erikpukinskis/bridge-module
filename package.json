@@ -11,9 +11,9 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "module-library": "*",
-    "string-tree": "*",
-    "function-call": "*"
+    "function-call": "*",
+    "module-library": "^0.93.0",
+    "string-tree": "*"
   },
   "devDependencies": {
     "run-test": "*",
