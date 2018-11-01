@@ -44,7 +44,7 @@ module.exports = library.export(
         throw new Error(sourceLibrary.id+" does not seem to know about any so-called \""+name+"\" module. "+modulePath)
       }
 
-      var deps = module.dependencies.map(sourceLibrary.dealias)
+      var deps = module.dependencies.map(sourceLibrary.dealias.bind(sourceLibrary))
 
       var func = module.func
 
