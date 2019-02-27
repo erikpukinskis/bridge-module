@@ -215,6 +215,14 @@ module.exports = library.export(
         }
       }
 
+    BoundModule.prototype.methodCall = function(methodName) {
+      var base = this.get()
+      if (this.args && this.args.length > 0) {
+        base += "("+functionCall.argumentString(this.args)+")"
+      }
+      return functionCall(base).methodCall(methodName)
+    }
+
     BoundModule.prototype.withArgs =
       function() {
         var args = Array.prototype.slice.call(arguments)
