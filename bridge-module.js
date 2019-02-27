@@ -216,11 +216,11 @@ module.exports = library.export(
       }
 
     BoundModule.prototype.methodCall = function(methodName) {
-      var base = this.get()
-      if (this.args && this.args.length > 0) {
-        base += "("+functionCall.argumentString(this.args)+")"
-      }
-      return functionCall(base).methodCall(methodName)
+
+      if (this.args) {
+        throw new Error("Can't build a methodCall off a module singleton with arguments. That's just weird") }
+
+      return functionCall(this.libraryIdentifier+".get").withArgs(this.name).methodCall(methodName)
     }
 
     BoundModule.prototype.withArgs =
