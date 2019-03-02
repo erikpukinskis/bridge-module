@@ -46,6 +46,11 @@ module.exports = library.export(
 
       var deps = module.dependencies.map(sourceLibrary.dealias.bind(sourceLibrary))
 
+      if (contains(deps, "bridge-module")) {
+        var message = "Can't put "+name+" on the bridge, because it has its own dependecy on browser-bridge. Can you see the contradiction there?"
+        throw new Error(message)
+      }
+
       var func = module.func
 
       deps.forEach(function(dep) {
