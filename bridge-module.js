@@ -177,7 +177,7 @@ module.exports = library.export(
       this.__isFunctionCallBinding = true
     }
 
-    BoundModule.prototype.asBinding = function() {
+    BoundModule.prototype.asCall = function() {
       return new BindingBinding(this)
     }
 
