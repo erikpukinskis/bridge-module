@@ -18,7 +18,7 @@
   "devDependencies": {
     "browser-bridge": "^0.147.0",
     "browser-task": "*",
-    "run-test": "*",
+    "run-test": "^0.55.0",
     "web-element": "*",
     "web-site": "*"
   },
