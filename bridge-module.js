@@ -61,8 +61,12 @@ module.exports = library.export(
         loadModule(bridge, dep, sourceLibrary, modulePath)
       })
 
-      moduleBinding = functionCall(
-        libraryIdentifier).asSingleton().methodCall("get").withArgs(name)
+      getModule = functionCall(
+        libraryIdentifier).singleton().methodCall("get").withArgs(name)
+
+      var getterSource = getModule.evalable()
+
+      var moduleBinding = functionCall(getterSource).singleton()
 
       if (parent) {
         var comment = "// "+name+" loaded as a dependency because "+parent
