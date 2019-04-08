@@ -58,10 +58,10 @@ module.exports = library.export(
           throw new Error(modulePath+" wants us to load browser-bridge in the browser. Don't know how to do that yet.")
         }
 
-        loadModule(bridge, dep, sourceLibrary, modulePath)
+        loadModule(sourceLibrary, dep, bridge, modulePath)
       })
 
-      getModule = functionCall(
+      var getModule = functionCall(
         libraryIdentifier).singleton().methodCall("get").withArgs(name)
 
       var getterSource = getModule.evalable().replace(/\"/g, "'")
@@ -83,13 +83,13 @@ module.exports = library.export(
       return moduleBinding
     }
 
-    function loadModule(bridge, moduleToLoad, sourceLibrary, modulePath) {
+    function loadModule(sourceLibrary, name, bridge, modulePath) {
 
-      if (moduleToLoad.__dependencyType == 'self reference') {
+      if (name.__dependencyType == 'self reference') {
         return 
       }
 
-      bridgeModule(sourceLibrary, moduleToLoad, bridge, modulePath)
+      bridgeModule(sourceLibrary, name, bridge, modulePath)
     }
 
     function loadedComment() {
