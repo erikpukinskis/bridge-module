@@ -64,7 +64,7 @@ module.exports = library.export(
       getModule = functionCall(
         libraryIdentifier).singleton().methodCall("get").withArgs(name)
 
-      var getterSource = getModule.evalable()
+      var getterSource = getModule.evalable().replace("\"", "'")
 
       var moduleBinding = functionCall(getterSource).singleton()
 
