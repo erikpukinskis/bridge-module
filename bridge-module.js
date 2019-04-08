@@ -61,13 +61,8 @@ module.exports = library.export(
         loadModule(bridge, dep, sourceLibrary, modulePath)
       })
 
-      moduleBinding =
-        new BoundModule(
-          name,
-          func,
-          deps,
-          libraryIdentifier
-        )
+      moduleBinding = functionCall(
+        libraryIdentifier).asSingleton().methodCall("get").withArgs(name)
 
       if (parent) {
         var comment = "// "+name+" loaded as a dependency because "+parent
@@ -163,92 +158,6 @@ module.exports = library.export(
       bridge.see("bridge-module/bindings", {})
 
       return libraryBinding.identifier
-    }
-
-    // Uh oh. This should be coming from function-call!!
-
-    function BoundModule(name, func, dependencies, libraryIdentifier, args) {
-
-      this.name = name
-      this.func = func
-      this.dependencies = dependencies
-      this.libraryIdentifier = libraryIdentifier
-      this.args = args
-      this.__isFunctionCallBinding = true
-    }
-
-    BoundModule.prototype.asCall = function() {
-      return new BindingBinding(this)
-    }
-
-    function BindingBinding(boundModule) {
-      this.boundModule = boundModule
-    }
-
-    BindingBinding.prototype.callable = function() {
-      var source = "functionCall(\"library.get(\\\""+this.boundModule.name+"\\\")\")"
-
-      var hasArgs = this.boundModule.args && this.boundModule.args.length > 0
-
-      if (hasArgs) {
-        source += ".withArgs("+functionCall.argumentString(this.boundModule.args)+")"
-      }
-
-      return source
-    }
-
-    BoundModule.prototype.get =
-      function() {
-        return this.libraryIdentifier+".get(\""+this.name+"\")"
-      }
-
-    BoundModule.prototype.callable =
-      function(options) {
-        if (this.args && this.args.length > 0) {
-          return this.get()+".bind(null, "+functionCall.argumentString(this.args)+")"
-        } else {
-          return this.get()
-        }
-      }
-
-    BoundModule.prototype.evalable =
-      function(options) {
-        if (this.args && this.args.length > 0) {
-          return this.get()+"("+functionCall.argumentString(this.args, options)+")"
-        } else {
-          return this.get()
-        }
-      }
-
-    BoundModule.prototype.methodCall = function(methodName) {
-
-      if (this.args) {
-        throw new Error("Can't build a methodCall off a module singleton with arguments. That's just weird") }
-
-      return functionCall(this.libraryIdentifier+".get").withArgs(this.name).methodCall(methodName)
-    }
-
-    BoundModule.prototype.withArgs =
-      function() {
-        var args = Array.prototype.slice.call(arguments)
-
-        if (this.args) {
-          var args = [].concat(this.args, args)
-        } else {
-          var args = args
-        }
-
-        return new BoundModule(this.name, this.func, this.dependencies, this.libraryIdentifier, args)
-      }
-
-    function argToString(arg) {
-      var isBinding = arg && arg.__isFunctionCallBinding
-
-      if (isBinding) {
-        return arg.callable()
-      } else {
-        return JSON.stringify(arg)
-      }
     }
 
     function moduleSource(libraryIdentifier, name, deps, func) {
