@@ -23,6 +23,8 @@ module.exports = library.export(
 
       if (moduleBinding) { return moduleBinding }
 
+      functionCall.defineOn(bridge)
+
       var module = sourceLibrary.getModule(name)
 
       if (!module) {
