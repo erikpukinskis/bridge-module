@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "function-call": "*",
-    "module-library": "^0.93.0",
+    "module-library": "^0.94.0",
     "string-tree": "*"
   },
   "devDependencies": {
