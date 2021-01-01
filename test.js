@@ -3,10 +3,10 @@ var library = runTest.library
 
 runTest(
   "bind arguments to a singleton",
-  ["./", "browser-bridge"],
-  function(expect, done, bridgeModule, BrowserBridge) {
+  [library.ref(), "./", "browser-bridge"],
+  function(expect, done, lib, bridgeModule, BrowserBridge) {
 
-    library.define(
+    lib.library.define(
       "equivocate",
       function() {
         function ummmm(something, bodyLanguage) {
@@ -26,16 +26,16 @@ runTest(
       head.turn("slightly")
     })
 
-    var equivocate = bridgeModule(library, "equivocate", bridge)
+    var equivocate = bridgeModule(lib, "equivocate", bridge)
 
     var hunger = equivocate.withArgs("hungry", grimmace)
 
     expect(hunger.evalable()).to.equal(
-      "library.get(\"equivocate\")(\"hungry\", grimmace)"
+      "library.get('equivocate')(\"hungry\", grimmace)"
     )
 
     expect(hunger.callable()).to.equal(
-      "library.get(\"equivocate\").bind(null, \"hungry\", grimmace)"
+      "library.get('equivocate').bind(null, \"hungry\", grimmace)"
     )
 
     done()
@@ -46,17 +46,18 @@ runTest(
 runTest(
   "accessing the library from the browser",
 
-  ["browser-bridge", "web-site", "browser-task", "web-element", "./"],
-  function(expect, done, BrowserBridge, WebSite, browserTask, element, bridgeModule) {
+  [library.ref(), "browser-bridge", "web-site", "browser-task", "web-element", "./"],
+  function(expect, done, lib, BrowserBridge, WebSite, browserTask, element, bridgeModule) {
 
-    library.define(
+
+    lib.library.define(
       "hamburg",
       function hamburg() {
         return "bleu"
       }
     )
 
-    library.define(
+    lib.library.define(
       "withASneeze",
       ["hamburg"],
       function fleur(hamburg) {
@@ -64,9 +65,11 @@ runTest(
       }
     )
 
+
     var bridge = new BrowserBridge()
 
-    var withASneeze = bridgeModule(library, "withASneeze", bridge)
+    debugger
+    var withASneeze = bridgeModule(lib, "withASneeze", bridge)
 
     var sayIt = bridge.defineFunction(
       [withASneeze],
@@ -113,10 +116,10 @@ runTest(
 
 runTest(
   "add nrtv-library singletons as bridge modules",
-  ["./", "browser-bridge", "web-site", "browser-task"],
-  function(expect, done, bridgeModule, BrowserBridge, WebSite, browserTask) {
+  [library.ref(), "./", "browser-bridge", "web-site", "browser-task"],
+  function(expect, done, lib, bridgeModule, BrowserBridge, WebSite, browserTask) {
 
-    library.define(
+    lib.library.define(
       "elephantize",
       function() {
         function elephantize(name) {
@@ -128,8 +131,8 @@ runTest(
 
     var bridge = new BrowserBridge()
 
-    var elephantizeInBrowser = bridgeModule(library, "elephantize", bridge)
-    
+    var elephantizeInBrowser = bridgeModule(lib, "elephantize", bridge)
+
 
     bridge.domReady(
       [elephantizeInBrowser],

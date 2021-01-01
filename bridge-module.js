@@ -5,19 +5,24 @@ module.exports = library.export(
   ["string-tree", "module-library", "function-call"],
   function(Tree, Library, functionCall) {
 
-    function bridgeModule(sourceLibrary, originalName, bridge, parent) {
+    function bridgeModule(libraryRef, originalName, bridge, parent) {
 
       if (!bridge || !bridge.__isNrtvBrowserBridge) {
         throw new Error("The third argument of bridgeModule should be a bridge. You passed "+bridge)
       }
 
-      if (!sourceLibrary.__isNrtvLibrary) {
-        throw new Error("The first argument to bridgeModule needs to be a module-library. Add library.ref() as one of your dependencies and pass the singleton to bridgeModule.")
+      if (libraryRef.__isLibraryRef) {
+        var sourceLibrary = libraryRef.library
+      } else {
+        debugger
+        throw new Error("The first argument to bridgeModule needs to be a module-library. Add library.ref() as one of your dependencies and pass the singleton to bridgeModule. You passed "+libraryRef)
       }
 
       var libraryIdentifier = bridgeLibrary(bridge)
 
+
       var name = sourceLibrary.dealias(originalName)
+
 
       var moduleBinding = bridge.remember("bridge-module/bindings/"+name)
 
@@ -60,7 +65,14 @@ module.exports = library.export(
           throw new Error(modulePath+" wants us to load browser-bridge in the browser. Don't know how to do that yet.")
         }
 
-        loadModule(sourceLibrary, dep, bridge, modulePath)
+        if (dep.__dependencyType == 'self reference') {
+          return }
+
+        bridgeModule(
+          libraryRef,
+          dep,
+          bridge,
+          modulePath)
       })
 
       var getModule = functionCall(
@@ -83,15 +95,6 @@ module.exports = library.export(
       bridge.see("bridge-module/bindings/"+name, moduleBinding)
 
       return moduleBinding
-    }
-
-    function loadModule(sourceLibrary, name, bridge, modulePath) {
-
-      if (name.__dependencyType == 'self reference') {
-        return 
-      }
-
-      bridgeModule(sourceLibrary, name, bridge, modulePath)
     }
 
     function loadedComment() {
@@ -137,8 +140,8 @@ module.exports = library.export(
 
       var binding = bridge.remember("bridge-module/library")
 
-      if (binding) { 
-        return binding.identifier 
+      if (binding) {
+        return binding.identifier
       }
 
       bridge.claimIdentifier("Tree")
